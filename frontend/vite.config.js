@@ -5,8 +5,9 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [vue()],
   server: {
-    port: 3000,
-    open: true,
+    host: '0.0.0.0',
+    port: parseInt(process.env.PORT) || 3000,
+    open: process.env.PORT ? false : true,
     proxy: {
       '/api': {
         target: 'http://localhost:5001',
