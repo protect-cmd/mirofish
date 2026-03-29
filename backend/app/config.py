@@ -34,6 +34,9 @@ class Config:
     
     # Zep配置
     ZEP_API_KEY = os.environ.get('ZEP_API_KEY')
+
+    # Access control
+    ACCESS_PASSWORD = os.environ.get('ACCESS_PASSWORD', '')
     
     # 文件上传配置
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50MB

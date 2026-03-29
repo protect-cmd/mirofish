@@ -12,6 +12,7 @@ const service = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   config => {
+    config.headers['X-Access-Key'] = sessionStorage.getItem('access_key') || ''
     return config
   },
   error => {
@@ -35,17 +36,25 @@ service.interceptors.response.use(
   },
   error => {
     console.error('Response error:', error)
-    
+
+    // 处理401 - 密码错误或未登录，跳转到登录页
+    if (error.response?.status === 401) {
+      sessionStorage.removeItem('access_key')
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
+    }
+
     // 处理超时
     if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
       console.error('Request timeout')
     }
-    
+
     // 处理网络错误
     if (error.message === 'Network Error') {
       console.error('Network error - please check your connection')
     }
-    
+
     return Promise.reject(error)
   }
 )
