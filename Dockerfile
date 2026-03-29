@@ -1,29 +1,31 @@
-FROM python:3.11
+FROM python:3.11-slim
 
-# 安装 Node.js （满足 >=18）及必要工具
+# Install Node.js and build tools
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends nodejs npm \
+  && apt-get install -y --no-install-recommends nodejs npm gcc g++ \
   && rm -rf /var/lib/apt/lists/*
 
-# 从 uv 官方镜像复制 uv
+# Copy uv from official image
 COPY --from=ghcr.io/astral-sh/uv:0.9.26 /uv /uvx /bin/
 
 WORKDIR /app
 
-# 先复制依赖描述文件以利用缓存
+# Copy dependency files first (layer cache)
 COPY package.json package-lock.json ./
 COPY frontend/package.json frontend/package-lock.json ./frontend/
 COPY backend/pyproject.toml backend/uv.lock ./backend/
 
-# 安装依赖（Node + Python）
+# Install Node deps + Python deps
+# Install CPU-only PyTorch to avoid the 2.5GB CUDA version
 RUN npm ci \
   && npm ci --prefix frontend \
-  && cd backend && uv sync --frozen
+  && cd backend \
+  && uv sync --frozen --no-install-package torch --no-install-package torchvision --no-install-package torchaudio \
+  && uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-# 复制项目源码
+# Copy source code
 COPY . .
 
 EXPOSE 3000 5001
 
-# 同时启动前后端（开发模式）
 CMD ["npm", "run", "dev"]
