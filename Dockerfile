@@ -21,7 +21,7 @@ RUN npm ci \
   && npm ci --prefix frontend \
   && cd backend \
   && uv sync --frozen --no-install-package torch --no-install-package torchvision --no-install-package torchaudio \
-  && uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+  && .venv/bin/pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 # Copy source code
 COPY . .
