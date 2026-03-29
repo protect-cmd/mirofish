@@ -8,7 +8,7 @@ export default defineConfig({
     host: '0.0.0.0',
     port: parseInt(process.env.PORT) || 3000,
     open: process.env.PORT ? false : true,
-    allowedHosts: true,
+    allowedHosts: ['.onrender.com', 'localhost'],
     proxy: {
       '/api': {
         target: 'http://localhost:5001',
